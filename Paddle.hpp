@@ -19,15 +19,10 @@ struct Paddle {
 
 	// physics constants
 	const float       mass                = 1.0f;  
-	const float       linear_friction     = 0.0f; 
-	const float       angular_friction    = 0.0f;
+	const float       linear_friction     = 3.0f; 
+	const float       angular_friction    = 2.0f;
 	const glm::vec2   paddle_radius       = glm::vec2(1.0f, 0.2f);
-	// moment of inertia of cylinder, from
-	// https://en.wikipedia.org/wiki/List_of_moments_of_inertia
-	const float       moment_of_inertia   = 
-		(mass * paddle_radius.y * paddle_radius.y / 4.0f) +
-		(mass * paddle_radius.x * paddle_radius.x / 12.0f);
-	
+	const float       moment_of_inertia   = 1.0f;	
 	// force of sling, in N/m (or equivalent)
 	const float       sling_strength = 1.0f;
 	glm::mat3x2 clip_to_paddle;

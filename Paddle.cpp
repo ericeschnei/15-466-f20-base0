@@ -26,14 +26,23 @@ void Paddle::handle_click(glm::vec2 pos, bool down) {
 
 		glm::vec2 sling_start_world = this->paddle_to_clip * glm::vec3(this->sling_start, 1);
 		glm::vec2 hit_vector = sling_start_world - pos;
-		//glm::vec2 hit_vector_paddle = this->sling_start - pos_paddle;
+		glm::vec2 hit_vector_paddle = this->sling_start - pos_paddle;
 
 		glm::vec2 linear_delta =
+			(1.f / this->mass) *
 			this->sling_strength *  
 			glm::vec3(hit_vector, 1);
 		
 		this->linear_velocity += linear_delta;
-
+		
+		float angular_delta =
+			this->sling_start.x * 
+			hit_vector_paddle.y * 
+			this->sling_strength /
+			this->moment_of_inertia;
+		
+		this->angular_velocity += angular_delta;
+		std::cout << moment_of_inertia << std::endl;
 	}
 }
 
@@ -73,6 +82,23 @@ void Paddle::update(float elapsed) {
 	this->position += this->linear_velocity  * elapsed;
 	this->normal   += this->angular_velocity * elapsed;
 
+
+	// friction
+	if (glm::length(this->linear_velocity) <= linear_friction * elapsed) {
+		this->linear_velocity = glm::vec2(0.0f, 0.0f);
+	} else {
+		this->linear_velocity -= 
+			glm::normalize(this->linear_velocity) * linear_friction * elapsed;
+	}
+
+	if (glm::abs(this->angular_velocity) <= angular_friction * elapsed) {
+		this->angular_velocity = 0.0f;
+	} else {
+		this->angular_velocity -=
+			glm::sign(this->angular_velocity) * angular_friction * elapsed;
+	}
+	
+	// regenerate matrices
 	glm::vec2 pos = this->position;
 	float normal  = this->normal;
 
