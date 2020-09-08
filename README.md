@@ -1,4 +1,4 @@
-# Defend the Large Blue Circle from a Sizable Conglomerate of Red Circles
+# Defend the Large Blue Circle from a Sizable Conglomerate of Smaller Red Circles
 
 Author: Eric Schneider
 
