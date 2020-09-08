@@ -15,6 +15,8 @@ DefendMode::DefendMode() {
 	ball_trail.emplace_back(ball, trail_length);
 	ball_trail.emplace_back(ball, 0.0f);
 
+	Ball *ball = new Ball(glm::vec2(5.0f, 7.0f), 1.0f);
+	balls.push_back(ball);
 	
 	//----- allocate OpenGL resources -----
 	{ //vertex buffer:
@@ -156,7 +158,23 @@ void DefendMode::update(float elapsed) {
 	static std::mt19937 mt; //mersenne twister pseudo-random number generator
 
 	//----- paddle update -----
+	
+	size_t i = 0;
+	while (i < balls.size()) {
+		Ball *b = balls[i];
 
+		b->update(elapsed);
+		if (glm::length(b->position) < this->center_radius) {
+			// https://stackoverflow.com/a/46282890
+			balls[i] = balls.back();
+			delete b;
+			balls.pop_back();
+		} else {
+			i++;
+		}
+
+	}
+	
 	paddle.update(elapsed);
 
 	{ //right player ai:
@@ -348,7 +366,7 @@ void DefendMode::draw(glm::uvec2 const &drawable_size) {
 	}
 
 	//solid objects:
-
+	balls[0]->draw(vertices);
 	paddle.draw(vertices);
 	//walls:
 	draw_rectangle(glm::vec2(-court_radius.x-wall_radius, 0.0f), glm::vec2(wall_radius, court_radius.y + 2.0f * wall_radius), fg_color);

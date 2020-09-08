@@ -42,7 +42,6 @@ void Paddle::handle_click(glm::vec2 pos, bool down) {
 			this->moment_of_inertia;
 		
 		this->angular_velocity += angular_delta;
-		std::cout << moment_of_inertia << std::endl;
 	}
 }
 

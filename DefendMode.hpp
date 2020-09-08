@@ -4,6 +4,7 @@
 #include "GL.hpp"
 #include "Paddle.hpp"
 #include "Vertex.hpp"
+#include "Ball.hpp"
 
 #include <glm/glm.hpp>
 
@@ -40,7 +41,12 @@ struct DefendMode : Mode {
 
 	float ai_offset = 0.0f;
 	float ai_offset_update = 0.0f;
-	
+
+	float center_radius = 1.0f;
+	float ball_speed = 1.0f;
+	float ball_period = 0.5f; // seconds per ball
+	float ball_timer = 0.0f;
+	std::vector<Ball *> balls;
 	Paddle paddle;
 	//----- pretty rainbow trails -----
 
