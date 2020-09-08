@@ -193,7 +193,7 @@ void DefendMode::update(float elapsed) {
 		while(ball_timer > ball_period) {
 			ball_timer -= ball_period;
 
-			float start_angle = mt() * 6.283185;
+			float start_angle = mt() * 6.283185f;
 			glm::vec2 start_pos = glm::vec2(
 				glm::cos(start_angle) * 10.0f,
 				glm::sin(start_angle) * 10.0f
@@ -234,7 +234,7 @@ void DefendMode::draw(glm::uvec2 const &drawable_size) {
 	// draw a circle
 	glm::vec2 last_pos;
 	for (int i = 0; i <= center_num_segments; i++) {
-		float angle = ((float) i) / center_num_segments * 6.28319;
+		float angle = ((float) i) / center_num_segments * 6.28319f;
 		glm::vec2 pos = glm::vec2(
 			center_radius * glm::cos(angle),
 			center_radius * glm::sin(angle)
