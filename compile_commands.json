@@ -1,0 +1,149 @@
+[
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-no-pie",
+            "-std=c++14",
+            "-g",
+            "-Wall",
+            "-Werror",
+            "-I../nest-libs/linux/SDL2/include/SDL2",
+            "-D_REENTRANT",
+            "-I../nest-libs/linux/glm/include",
+            "-I../nest-libs/linux/libpng/include",
+            "-O",
+            "-o",
+            "objs/main.o",
+            "main.cpp"
+        ],
+        "directory": "/home/eric/homework/15466/15-466-f20-base0",
+        "file": "main.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-no-pie",
+            "-std=c++14",
+            "-g",
+            "-Wall",
+            "-Werror",
+            "-I../nest-libs/linux/SDL2/include/SDL2",
+            "-D_REENTRANT",
+            "-I../nest-libs/linux/glm/include",
+            "-I../nest-libs/linux/libpng/include",
+            "-O",
+            "-o",
+            "objs/load_save_png.o",
+            "load_save_png.cpp"
+        ],
+        "directory": "/home/eric/homework/15466/15-466-f20-base0",
+        "file": "load_save_png.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-no-pie",
+            "-std=c++14",
+            "-g",
+            "-Wall",
+            "-Werror",
+            "-I../nest-libs/linux/SDL2/include/SDL2",
+            "-D_REENTRANT",
+            "-I../nest-libs/linux/glm/include",
+            "-I../nest-libs/linux/libpng/include",
+            "-O",
+            "-o",
+            "objs/PongMode.o",
+            "PongMode.cpp"
+        ],
+        "directory": "/home/eric/homework/15466/15-466-f20-base0",
+        "file": "PongMode.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-no-pie",
+            "-std=c++14",
+            "-g",
+            "-Wall",
+            "-Werror",
+            "-I../nest-libs/linux/SDL2/include/SDL2",
+            "-D_REENTRANT",
+            "-I../nest-libs/linux/glm/include",
+            "-I../nest-libs/linux/libpng/include",
+            "-O",
+            "-o",
+            "objs/GL.o",
+            "GL.cpp"
+        ],
+        "directory": "/home/eric/homework/15466/15-466-f20-base0",
+        "file": "GL.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-no-pie",
+            "-std=c++14",
+            "-g",
+            "-Wall",
+            "-Werror",
+            "-I../nest-libs/linux/SDL2/include/SDL2",
+            "-D_REENTRANT",
+            "-I../nest-libs/linux/glm/include",
+            "-I../nest-libs/linux/libpng/include",
+            "-O",
+            "-o",
+            "objs/gl_compile_program.o",
+            "gl_compile_program.cpp"
+        ],
+        "directory": "/home/eric/homework/15466/15-466-f20-base0",
+        "file": "gl_compile_program.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-no-pie",
+            "-std=c++14",
+            "-g",
+            "-Wall",
+            "-Werror",
+            "-I../nest-libs/linux/SDL2/include/SDL2",
+            "-D_REENTRANT",
+            "-I../nest-libs/linux/glm/include",
+            "-I../nest-libs/linux/libpng/include",
+            "-O",
+            "-o",
+            "objs/Mode.o",
+            "Mode.cpp"
+        ],
+        "directory": "/home/eric/homework/15466/15-466-f20-base0",
+        "file": "Mode.cpp"
+    },
+    {
+        "arguments": [
+            "g++",
+            "-c",
+            "-no-pie",
+            "-std=c++14",
+            "-g",
+            "-Wall",
+            "-Werror",
+            "-I../nest-libs/linux/SDL2/include/SDL2",
+            "-D_REENTRANT",
+            "-I../nest-libs/linux/glm/include",
+            "-I../nest-libs/linux/libpng/include",
+            "-O",
+            "-o",
+            "objs/ColorTextureProgram.o",
+            "ColorTextureProgram.cpp"
+        ],
+        "directory": "/home/eric/homework/15466/15-466-f20-base0",
+        "file": "ColorTextureProgram.cpp"
+    }
+]

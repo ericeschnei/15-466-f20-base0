@@ -1,0 +1,62 @@
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+	
+	const float PI					= 3.14159265359;
+	const float PI2					= 1.57079632679;
+	const float TAU					= 6.28318530718;
+	
+	const float BULGE_AMT			= 0.10;
+	const float NOISE_TIMESCALE		= 1./6.; // sec/frame
+	const float NOISE_DOWNSAMPLE	= 0.005; // larger number = larger noise
+	const float NOISE_INTENSITY		= 0.2;	 // 0 to 1
+	const float NUM_SCANLINES		= 45.;
+	const float SCANLINE_INTENSITY	= 0.7;
+	const float SCANLINE_SPEED		= 0.03;
+	const float SCANLINE_STRENGTH	= 0.4;
+	// Normalized pixel coordinates (from -0.5 to 0.5)
+	vec2 uv = fragCoord/iResolution.xy - vec2(0.5, 0.5);
+	uv = vec2(
+		uv.x * (1. - BULGE_AMT * cos(PI * uv.y)), 
+		uv.y * (1. - BULGE_AMT * cos(PI * uv.x))
+	);
+	uv = uv + vec2(0.5, 0.5);
+	// Time varying pixel color
+	vec3 col = 0.5 + 0.5*cos(iTime+uv.xyx+vec3(0,2,4));
+	
+	// generate noise
+	float time = NOISE_TIMESCALE * floor(iTime / NOISE_TIMESCALE);
+	vec2 noiseCoord = NOISE_DOWNSAMPLE * floor(uv / NOISE_DOWNSAMPLE);
+	float noiseRed =
+		fract(sin(
+			fract(sin(noiseCoord.x) * 1000000.) +
+			fract(sin(noiseCoord.y) * 1000000.) +
+			fract(sin(time) * 1000000.)
+		) * 1000000.) * NOISE_INTENSITY + (0.5 - NOISE_INTENSITY / 2.);
+	float noiseBlue =
+		fract(sin(
+			fract(sin(noiseCoord.x) * 10000.) +
+			fract(sin(noiseCoord.y) * 10000.) +
+			fract(sin(time) * 10000.)
+		) * 10000.) * NOISE_INTENSITY + (0.5 - NOISE_INTENSITY / 2.);
+	float noiseGreen =
+		fract(sin(
+			fract(sin(noiseCoord.x) * 1000.) +
+			fract(sin(noiseCoord.y) * 1000.) +
+			fract(sin(time) * 1000.)
+		) * 1000.) * NOISE_INTENSITY + (0.5 - NOISE_INTENSITY / 2.);
+	vec3 noise = vec3(noiseRed, noiseGreen, noiseBlue);
+	
+	float scanlineAmt = 
+		clamp(
+			(sin(NUM_SCANLINES * TAU * (uv.y + iTime * SCANLINE_SPEED)) + 1.)/2., 
+			0., 
+			SCANLINE_STRENGTH
+		) / SCANLINE_STRENGTH;
+	vec3 tex = texture(iChannel0, uv).xyz;
+	// add noise with "overlay" blend mode
+	tex = (1. - 2. * noise) * tex * tex + 2. * tex * noise;
+	// add scanlines with "multiply" blend mode
+	tex = tex * (1. - ((1. - scanlineAmt) * SCANLINE_STRENGTH));
+	
+	fragColor = vec4(tex, 1.0);
+}
