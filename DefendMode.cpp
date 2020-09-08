@@ -118,14 +118,34 @@ DefendMode::~DefendMode() {
 }
 
 bool DefendMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
+	
+	glm::vec2 clip_mouse;
+	switch (evt.type) {
+		case SDL_MOUSEMOTION:
+			//convert mouse from window pixels (top-left origin, +y is down) to clip space ([-1,1]x[-1,1], +y is up):
+			clip_mouse = glm::vec2(
+				(evt.motion.x + 0.5f) / window_size.x * 2.0f - 1.0f,
+				(evt.motion.y + 0.5f) / window_size.y *-2.0f + 1.0f
+			);
+			left_paddle.y = (clip_to_court * glm::vec3(clip_mouse, 1.0f)).y;
+			return true;
+			break;
+		case SDL_MOUSEBUTTONDOWN:
+		case SDL_MOUSEBUTTONUP:
+			clip_mouse = glm::vec2(
+				(evt.button.x + 0.5f) / window_size.x * 2.0f - 1.0f,
+				(evt.button.y + 0.5f) / window_size.y *-2.0f + 1.0f
+			);
 
-	if (evt.type == SDL_MOUSEMOTION) {
-		//convert mouse from window pixels (top-left origin, +y is down) to clip space ([-1,1]x[-1,1], +y is up):
-		glm::vec2 clip_mouse = glm::vec2(
-			(evt.motion.x + 0.5f) / window_size.x * 2.0f - 1.0f,
-			(evt.motion.y + 0.5f) / window_size.y *-2.0f + 1.0f
-		);
-		left_paddle.y = (clip_to_court * glm::vec3(clip_mouse, 1.0f)).y;
+			if (evt.button.button == SDL_BUTTON_LEFT) {
+				paddle.handle_click(
+					(clip_to_court * glm::vec3(clip_mouse, 1.0f)), 
+					evt.type == SDL_MOUSEBUTTONDOWN
+				);
+				return true;
+			}
+
+			break;
 	}
 
 	return false;
@@ -136,6 +156,8 @@ void DefendMode::update(float elapsed) {
 	static std::mt19937 mt; //mersenne twister pseudo-random number generator
 
 	//----- paddle update -----
+
+	paddle.update(elapsed);
 
 	{ //right player ai:
 		ai_offset_update -= elapsed;
@@ -278,6 +300,8 @@ void DefendMode::draw(glm::uvec2 const &drawable_size) {
 	//vertices will be accumulated into this list and then uploaded+drawn at the end of this function:
 	std::vector< Vertex > vertices;
 
+	paddle.draw(vertices);
+
 	//inline helper function for rectangle drawing:
 	auto draw_rectangle = [&vertices](glm::vec2 const &center, glm::vec2 const &radius, glm::u8vec4 const &color) {
 		//draw rectangle as two CCW-oriented triangles:
@@ -325,6 +349,7 @@ void DefendMode::draw(glm::uvec2 const &drawable_size) {
 
 	//solid objects:
 
+	paddle.draw(vertices);
 	//walls:
 	draw_rectangle(glm::vec2(-court_radius.x-wall_radius, 0.0f), glm::vec2(wall_radius, court_radius.y + 2.0f * wall_radius), fg_color);
 	draw_rectangle(glm::vec2( court_radius.x+wall_radius, 0.0f), glm::vec2(wall_radius, court_radius.y + 2.0f * wall_radius), fg_color);

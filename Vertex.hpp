@@ -1,3 +1,4 @@
+#pragma once
 #include <glm/glm.hpp>
 
 // Vertex struct, used by Paddle, ball, and 
