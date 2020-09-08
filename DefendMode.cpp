@@ -11,9 +11,6 @@
 DefendMode::DefendMode() {
 
 
-	Ball *ball = new Ball(glm::vec2(5.0f, 7.0f), 1.0f);
-	balls.push_back(ball);
-	
 	//----- allocate OpenGL resources -----
 	{ //vertex buffer:
 		glGenBuffers(1, &vertex_buffer);
@@ -125,6 +122,7 @@ bool DefendMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_siz
 				(evt.motion.x + 0.5f) / window_size.x * 2.0f - 1.0f,
 				(evt.motion.y + 0.5f) / window_size.y *-2.0f + 1.0f
 			);
+			paddle.mouse_pos = clip_to_court * glm::vec3(clip_mouse, 1.0f);
 			return true;
 			break;
 		case SDL_MOUSEBUTTONDOWN:
@@ -156,13 +154,33 @@ void DefendMode::update(float elapsed) {
 	size_t i = 0;
 	while (i < balls.size()) {
 		Ball *b = balls[i];
-
+		
+		// update ball positions
 		b->update(elapsed);
-		if (glm::length(b->position) < this->center_radius) {
+
+		// if the paddle is touching a ball, delete it
+		if (paddle.is_colliding(*b)) {
 			// https://stackoverflow.com/a/46282890
 			balls[i] = balls.back();
 			delete b;
 			balls.pop_back();
+			player_score++;
+		// if any balls made it to the center, delete them
+		} else if (glm::length(b->position) < this->center_radius) {
+			// https://stackoverflow.com/a/46282890
+			balls[i] = balls.back();
+			delete b;
+			balls.pop_back();
+			player_lives--;
+			// player ran out of lives, end game immediately
+			if (player_lives == 0) {
+				for (Ball *bb : balls) {
+					delete bb;
+				}
+				balls.clear();
+				
+				break;
+			}
 		} else {
 			i++;
 		}
@@ -170,36 +188,109 @@ void DefendMode::update(float elapsed) {
 	}
 
 	// spawn new balls
-	ball_timer += elapsed;
-	while(ball_timer > ball_period) {
-		ball_timer -= ball_period;
+	if (player_lives > 0) {
+		ball_timer += elapsed;
+		while(ball_timer > ball_period) {
+			ball_timer -= ball_period;
 
-		float start_angle = mt() * 6.283185;
-		glm::vec2 start_pos = glm::vec2(
-			glm::cos(start_angle) * 10.0f,
-			glm::sin(start_angle) * 10.0f
-		);
+			float start_angle = mt() * 6.283185;
+			glm::vec2 start_pos = glm::vec2(
+				glm::cos(start_angle) * 10.0f,
+				glm::sin(start_angle) * 10.0f
+			);
 
-		Ball *b = new Ball(start_pos, this->ball_speed);
-		this->ball_speed += this->ball_speed_inc;
-		
-		balls.push_back(b);
+			Ball *b = new Ball(start_pos, this->ball_speed);
+			this->ball_speed += this->ball_speed_inc;
+			
+			balls.push_back(b);
 
+		}
+		paddle.update(elapsed);
 	}
-	paddle.update(elapsed);
 
 }
 
 void DefendMode::draw(glm::uvec2 const &drawable_size) {
 
-	glm::u8vec4 bg_color = glm::u8vec4(0x00, 0x00, 0x00, 0xff);
+	glm::u8vec4 bg_color = glm::u8vec4(0x14, 0x2B, 0x3E, 0xff);
 	//---- compute vertices to draw ----
 
 	//vertices will be accumulated into this list and then uploaded+drawn at the end of this function:
 	std::vector< Vertex > vertices;
 
+	// draw main circle	
+	const int center_num_segments = 48;
+	const glm::u8vec4 center_color = glm::u8vec4(0x0A, 0x15, 0x1F, 0xff);
+
+	auto add_triangle = [center_color, &vertices](
+		const glm::vec2 &p1, const glm::vec2 &p2
+	) {
+		// define CCW tri
+		vertices.emplace_back(glm::vec3(p1, 0.0f), center_color, glm::vec2(0.0f, 0.0f));
+		vertices.emplace_back(glm::vec3(p2, 0.0f), center_color, glm::vec2(0.0f, 0.0f));
+		vertices.emplace_back(glm::vec3(0.0f, 0.0f, 0.0f), center_color, glm::vec2(0.0f, 0.0f));
+	};
+
+	// draw a circle
+	glm::vec2 last_pos;
+	for (int i = 0; i <= center_num_segments; i++) {
+		float angle = ((float) i) / center_num_segments * 6.28319;
+		glm::vec2 pos = glm::vec2(
+			center_radius * glm::cos(angle),
+			center_radius * glm::sin(angle)
+		);
+
+		if (i > 0) {
+			add_triangle(last_pos, pos);
+		}
+		last_pos = pos;
+	}
+
+
+	//inline helper function for rectangle drawing:
+	auto draw_rectangle = [&vertices](glm::vec2 const &center, glm::vec2 const &radius, glm::u8vec4 const &color) {
+		//draw rectangle as two CCW-oriented triangles:
+		vertices.emplace_back(glm::vec3(center.x-radius.x, center.y-radius.y, 0.0f), color, glm::vec2(0.5f, 0.5f));
+		vertices.emplace_back(glm::vec3(center.x+radius.x, center.y-radius.y, 0.0f), color, glm::vec2(0.5f, 0.5f));
+		vertices.emplace_back(glm::vec3(center.x+radius.x, center.y+radius.y, 0.0f), color, glm::vec2(0.5f, 0.5f));
+
+		vertices.emplace_back(glm::vec3(center.x-radius.x, center.y-radius.y, 0.0f), color, glm::vec2(0.5f, 0.5f));
+		vertices.emplace_back(glm::vec3(center.x+radius.x, center.y+radius.y, 0.0f), color, glm::vec2(0.5f, 0.5f));
+		vertices.emplace_back(glm::vec3(center.x-radius.x, center.y+radius.y, 0.0f), color, glm::vec2(0.5f, 0.5f));
+	};
+
+	glm::vec2 score_radius = glm::vec2(0.1f, 0.1f);
+	glm::u8vec4 score_color = glm::u8vec4(0x8E, 0xE3, 0xEF, 0xFF);
+	glm::u8vec4 lives_color = glm::u8vec4(0xC3, 0x3C, 0x54, 0xEF);
+	glm::vec2 score_padding = glm::vec2(0.2f, 1.0f);
+
+	// draw score
+	for (size_t i = 0; i < player_score; i++) {
+		draw_rectangle(
+			glm::vec2(
+				-court_radius.x + score_padding.x + (3.0f * i * score_radius.x),
+				court_radius.y - score_padding.y
+			), 
+			score_radius, score_color
+		);
+	}
+
+	// draw lives
+	for (size_t i = 0; i < player_lives; i++) {
+		draw_rectangle(
+			glm::vec2(
+				court_radius.x - score_padding.x - (3.0f * i * score_radius.x),
+				court_radius.y - score_padding.y
+			),
+			score_radius, lives_color
+		);
+	}
+
+
 	//solid objects:
-	balls[0]->draw(vertices);
+	for (Ball *b : balls) { 
+		b->draw(vertices);
+	}
 	paddle.draw(vertices);
 
 

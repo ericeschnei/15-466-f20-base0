@@ -9,20 +9,21 @@ struct Paddle {
 	Paddle();
 	~Paddle();
 	
-	void handle_collision(Ball &ball);
+	bool is_colliding(Ball &ball);
 	void handle_click(glm::vec2 pos, bool down);
 	void update(float elapsed);
 	void draw(std::vector<Vertex> &vertices);
 	
 	// colors from coolors.co (highly recommend, btw)
-	const glm::u8vec4 color = glm::u8vec4(0xFF, 0x88, 0x00, 0xFF);
+	const glm::u8vec4 color = glm::u8vec4(0x37, 0x71, 0x8E, 0xFF);
+	const glm::u8vec4 line_color = glm::u8vec4(0x8E, 0xE3, 0xEF, 0xFF);
 
 	// physics constants
-	const float       mass                = 1.0f;  
-	const float       linear_friction     = 3.0f; 
-	const float       angular_friction    = 2.0f;
+	const float       mass                = 0.5f;  
+	const float       linear_friction     = 5.0f; 
+	const float       angular_friction    = 1.75f;
 	const glm::vec2   paddle_radius       = glm::vec2(1.0f, 0.2f);
-	const float       moment_of_inertia   = 1.0f;	
+	const float       moment_of_inertia   = 0.4f;	
 	// force of sling, in N/m (or equivalent)
 	const float       sling_strength = 1.0f;
 	glm::mat3x2 clip_to_paddle;
@@ -32,7 +33,8 @@ struct Paddle {
 	glm::vec2   sling_start;
 	glm::vec2   sling_end;
 	bool        sling_held          = false;
-
+	
+	glm::vec2   mouse_pos;
 
 	
 

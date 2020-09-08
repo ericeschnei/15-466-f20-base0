@@ -26,11 +26,14 @@ struct DefendMode : Mode {
 
 	//----- game state -----
 
+	size_t player_score = 0;
+	size_t player_lives = 5;
+
 	float ball_speed = 1.0f;
 	const float ball_speed_inc = 0.02f; // amount to increase speed over time
-	const float ball_period = 0.5f; // seconds per ball
+	const float ball_period = 2.0f; // seconds per ball
 
-	glm::vec2 court_radius = glm::vec2(7.0f, 5.0f);
+	glm::vec2 court_radius = glm::vec2(7.0f, 7.0f);
 
 	float center_radius = 1.0f;
 	float ball_timer = 0.0f;
