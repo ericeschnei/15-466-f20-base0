@@ -18,7 +18,7 @@ void Ball::draw(std::vector<Vertex> &vertices) {
 	// draw a circle
 	glm::vec2 last_pos;
 	for (int i = 0; i <= BALL_NUM_TRIANGLES; i++) {
-		float angle = ((float) i) / BALL_NUM_TRIANGLES * 6.28319;
+		float angle = ((float) i) / BALL_NUM_TRIANGLES * 6.28319f;
 		glm::vec2 pos = glm::vec2(
 			this->radius * glm::cos(angle) + this->position.x,
 			this->radius * glm::sin(angle) + this->position.y
